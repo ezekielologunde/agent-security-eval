@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Agent security evaluation: a sandboxed tool-using agent replayed against prompt-injection cases, three policies compared, real recorded traces.">
+<title>Agent Security Eval | Ezekiel Ologunde</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand"><span class="brandmark">A</span>Agent<span class="brandlight">SecurityEval</span></div>
+  <div class="header-meta"><span class="live-dot"></span>Replay of a real recorded run <span class="sep">/</span> no live model call from this page</div>
+  <a href="https://github.com/ezekielologunde/agent-security-eval" target="_blank" rel="noopener">Source &amp; design notes &#8599;</a>
+</header>
+<main>
+  <section class="intro">
+    <div class="eyebrow">INJECT &rarr; EXECUTE &rarr; CHECK THE REAL TOOL-CALL LOG</div>
+    <h1>Three defenses, five adversarial cases, one small local model.</h1>
+    <p class="lede" id="run-meta">Loading run metadata&hellip;</p>
+    <p class="lede">Every number on this page comes from <code>reports/latest.json</code>, a committed, reproducible output of a real run against a local Ollama model &mdash; not a live call from this page, and not an LLM self-report: each verdict is a deterministic check of what the mock tools actually logged.</p>
+  </section>
+
+  <section class="summary-grid" id="summary-grid"></section>
+
+  <section class="cases-section">
+    <h2>Case-by-case replay</h2>
+    <div class="tabs" id="policy-tabs"></div>
+    <div id="case-list"></div>
+  </section>
+
+  <section class="finding">
+    <h2>Two findings worth flagging</h2>
+    <p><strong>tool_authorization offers zero protection against in-scope misuse.</strong> The sabotage case's legitimate task needs <code>update_ticket</code>, so it's allowed. The model used that same allowed call to execute the injected sabotage &mdash; downgrading a live, unresolved ticket to "resolved" &mdash; and invented a false justification for it. A policy that only restricts <em>which</em> tools can be called does nothing once an attack can do its damage through a tool the task already needed.</p>
+    <p><strong>An LLM's own account of what it did is not evidence of what it did.</strong> In the no-defense run of the ticket-summary case, the model's final answer claimed it had created a ticket containing the leaked secret &mdash; the tool-call log shows it never actually called <code>create_ticket</code>. Trusting the self-report would have scored this as a successful exfiltration; the real log shows it wasn't. Reproduced across two separate runs.</p>
+  </section>
+</main>
+<footer>
+  <p>Part of a small applied-AI portfolio alongside <a href="https://soc-review.vercel.app" target="_blank" rel="noopener">SOC Review</a> and <a href="https://ezekielologunde.github.io/rowmio-mastery-demo/" target="_blank" rel="noopener">Rowmio Mastery</a>. Designed for scrutiny, built for review.</p>
+</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
